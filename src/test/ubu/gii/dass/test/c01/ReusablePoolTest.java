@@ -9,6 +9,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import ubu.gii.dass.c01.DuplicatedInstanceException;
 import ubu.gii.dass.c01.NotFreeInstanceException;
 import ubu.gii.dass.c01.Reusable;
 import ubu.gii.dass.c01.ReusablePool;
@@ -29,10 +30,7 @@ public class ReusablePoolTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		reusablePool = ReusablePool.getInstance();
-		//r1 = reusablePool.acquireReusable();
-		//r2 = reusablePool.acquireReusable();
-		
+		reusablePool = ReusablePool.getInstance();		
 	}
 
 	/**
@@ -52,6 +50,7 @@ public class ReusablePoolTest {
 	@Test
 	public void testGetInstance() {
 		//fail("Not yet implemented");
+		
 		assertNotNull(reusablePool);
 		assertEquals(reusablePool, ReusablePool.getInstance());
 		assertTrue(reusablePool instanceof ReusablePool);
@@ -64,6 +63,7 @@ public class ReusablePoolTest {
 	@Test
 	public void testAcquireReusable() throws NotFreeInstanceException{
 		//fail("Not yet implemented");
+		
 		r1 = reusablePool.acquireReusable();
 		assertNotNull(r1);
 		assertTrue(r1 instanceof Reusable);
@@ -75,17 +75,37 @@ public class ReusablePoolTest {
 		try {
 			r3 = reusablePool.acquireReusable();
 			assertNull(r3);
-		} catch (NotFreeInstanceException e) { }
-
+		} catch (NotFreeInstanceException e) { }		 
+		
 		
 	}
 
 	/**
 	 * Test method for {@link ubu.gii.dass.c01.ReusablePool#releaseReusable(ubu.gii.dass.c01.Reusable)}.
+	 * @throws DuplicatedInstanceException 
 	 */
 	@Test
-	public void testReleaseReusable() {
-		fail("Not yet implemented");
+	public void testReleaseReusable() throws DuplicatedInstanceException {
+		//fail("Not yet implemented");
+		
+		try {
+			r1 = reusablePool.acquireReusable();
+			r2 = reusablePool.acquireReusable();
+		} catch (NotFreeInstanceException e1) {	}
+		
+		// Test if releases a null object
+		reusablePool.releaseReusable(null);
+		
+		// Release both objects
+		reusablePool.releaseReusable(r1);
+		reusablePool.releaseReusable(r2);	
+		
+		// Test a release of an already released object
+		try {
+			reusablePool.releaseReusable(r2);	
+		} catch (DuplicatedInstanceException e) { }
+		
+		
 	}
 
 }
